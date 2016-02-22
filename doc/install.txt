@@ -1,0 +1,16 @@
+There are packages available for delphi and lazarus (*.dpk and *.lpk respectively).
+Some users may prefer just installing as components.
+When compiling using crosskylix make sure this library is in your path.
+
+Install as package:
+* Select File - Open
+* Browse to the libsql.[l|d]pk package
+* Compile and install
+
+Install as components:
+* Choose 'Install Component' from the main menu (Component)
+* Select libsql.pas //(* 'sqlcomponents.pas' obsoleted, lazarus generated libsql.pas should work on win32 *)
+* Install them.
+
+Add the path to your envirenment variables (library path):
+* (Delphi) Tools - Environment Options - (Tabsheet) Library - (Edit) Library path - (Button) ..

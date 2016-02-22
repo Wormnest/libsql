@@ -1,0 +1,104 @@
+short readme on TLiteDB
+more extenisive documentation will be available in next release.
+
+TLiteDB is a delphi interface to the SQLite database engine.
+
+I've taken a good look a the source of sqlite.pas by Ben Hochstrasser (bhoc@surfeu.ch), even copied some pieces of source.
+note that version 0.1 even include the class by ben hochstrasser, so in one unit there are: TSqlite and TLiteDB declared.
+TLiteDB is my stuff. Use it for comparison or to find bugs.
+
+The adaptions i made mainly affect the way you can retrieve your result set. some additional classes are made: TResultRow and TResultCell. These classes simplify the use of data.
+
+- This is beta. please help me and report bugs and/or suggestions : rene@dubaron.com -
+
+Capabilities:
+
+open the database with the create method:
+db := tlitedb.create(databasename);
+alternatively, use the use method:
+db := tlitedb.create('');
+db.use (databasename);
+
+note that there is a compiler switch: WITH_GUI
+if declared, the tlitedb will be class TComponent, else it will be class TObject.
+Some additional features are available with the WITH_GUI directive.
+if compiled as component, the constructor would be like:
+db := tlitedb.create (Self, databasename);
+
+You can query by the query method:
+tlitedb.query (sql);
+to get just one result use the queryone:
+somestring=tlitedb.queryone (sql)
+which is the same as:
+tlitedb.query (sql)
+somestring := tlitedb.results[0][0];
+
+
+
+you can access results by
+1. tlitedb.results[y][x]
+2. tlitedb.results[y].format[x].asdesiredformat
+3. tlitedb.results[y].byfield['fieldname']
+4. tlitedb.results[y].asnamevalue
+
+method 1 just returns a string.
+with method 2 the AsString, AsInteger, AsBool and AsFloat are currently implemented, AsDateTime will follow.
+method 3 is about the same as results[y][x], except that instead of x you fill in the field name.
+method 4 will return a stringlist with name-values pairs. just do something like
+mymemo.lines.assign (db.results[y].asnamevalue);
+
+results[y] will return a TResultRow, with it's properties.
+results[y].format[x] will return a TResultCell, it's methods are the AsInteger, AsString etc conversions.
+
+To determinate if a result is null, use the IsNull:
+tlitedb.results[y].IsNull[x]
+will return a boolean result.
+
+taking a good look at the TResultRow and TResultCell class declaration will make clear how to use it.
+
+Most methods are intended to be safe, i.e. exceptions will not occur.
+Non-existing values will return:
+* an empty string
+* zero
+* IsNull is True
+
+you should use the rowcount and fields.count properties to know the size of your result set, if not known.
+
+another nice feature is the formatquery, where you can query like
+formatquery ('select * from %s where %s=%d', [ftable, ffield, random(10)] );
+this function does not escape strings yet, be carefull (replace ' with \', #0 with \0 etc).
+Note that escaping strings will be done automatically in next version, be aware if upgrading.
+
+if your query gets to large, you can set the callbackonly property to true and implement the
+onfetchrow event:
+TOnFetchRow = procedure (Sender:TObject; Row:TResultRow) of Object;
+Also you can set the maxquerysize (defaults to 16Mb) to avoid memory abuse, if callbackonly is set to false it will stop fetching if this size is exceeded.
+
+What's more:
+some effort was done to make tlitedb thread-safe. i.a. multiple threads can access the same database.
+Also, transacations are implemented in such a way that it's thread-safe, you should use the appropiate tlitedb methods for that:
+Tlitedb.starttransactione
+tlitedb.commit
+tlitedb.rollback
+
+alternatively you can do it yourself with the lock and unlock methods:
+tlitedb.lock;
+tlitedb.query ('begin');
+tlitedb.query ('commit');
+tlitedb.unlock;
+
+
+
+Installing:
+put the sqlite.pas file somewhere in your path or in your project dir.
+put sqlite.dll (w/o tcl) somewhere in your path or in your project dir.
+that's it.
+
+
+Licensing:
+This is open-source without any warranty. It is not LGPL since that would restrict use in commercial applications. License should be seen as MPL or BSD compatible lisence. This is beta. stable release will make the license clear.
+As far as i am concerned, use it as you think is appropiate. I would be pleased if you mail me suggestions:
+rene@dubaron.com
+
+What others say:
+Good luck man! So far you've done an excellent job of re-inventing the wheel. (eric)

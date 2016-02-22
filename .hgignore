@@ -1,0 +1,12 @@
+syntax: glob
+bin
+**.~*
+
+**.cfg
+**.cnt
+**.dcu
+**.dof
+**.dsm
+**.dsk
+**.exe
+**.GID

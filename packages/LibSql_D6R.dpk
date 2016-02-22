@@ -1,0 +1,46 @@
+package LibSql_D6R;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'LibSql Runtime Units'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl;
+
+contains
+  passql in '..\source\passql.pas',
+  pasmysql in '..\source\pasmysql.pas',
+  passqlite in '..\source\passqlite.pas',
+  libmysql in '..\source\libmysql.pas',
+  libsqlite in '..\source\libsqlite.pas',
+  libsqlite3 in '..\source\libsqlite3.pas',
+  utf8util in '..\source\utf8util.pas',
+  sqlsupport in '..\source\sqlsupport.pas',
+  libodbc32 in '..\source\libodbc32.pas',
+  pasodbc in '..\source\pasodbc.pas',
+  pasthreadedsqlite in '..\source\pasthreadedsqlite.pas';
+
+end.
