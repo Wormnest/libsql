@@ -36,6 +36,10 @@ unit janSQLStrings;
 
 interface
 
+{$ifdef fpc}
+  {$mode delphi}
+{$endif}
+
 uses
   Classes,sysUtils{,qstrings};
 

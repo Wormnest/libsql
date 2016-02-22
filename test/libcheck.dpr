@@ -10,12 +10,17 @@ program libcheck;
 uses
   Windows,
   SyncObjs,
+  {$IFNDEF FPC}
   MemCheck,
+  {$ENDIF}
   SysUtils,
   passql,
   passqlite,
   zlib,
-  staticsqlite3;
+  {$IFNDEF FPC}
+  staticsqlite3,
+  {$ENDIF}
+  libsql;
 
 var
   db: TLiteDB;
@@ -41,6 +46,7 @@ begin
     writeln ('User version: ', db.GetUserVersion);
     db.Free;
 
+    {$IFNDEF FPC}
     //basic query on DB
     db := TLiteDB.Create(nil, ':memory:');
     for i := 0 to 1000 do
@@ -48,6 +54,7 @@ begin
     writeln (db.Results[0].FieldName[0]);
     writeln (db.Results[0].FieldTypeName[0]);
     db.Free;
+    {$ENDIF}
 
     //basic formatquery on DB
     db := TLiteDB.Create(nil, ':memory:');

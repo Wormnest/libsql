@@ -171,7 +171,7 @@ begin
   tok.name:=FToken;
   tok.tokenkind:=FTokenKind;
   tok.value:=FTokenValue;
-  tok.operator:=FTokenOperator;
+  tok.tokenoperator:=FTokenOperator;
   tok.level:=FtokenLevel;
   tok.expression:=FTokenExpression;
   FInFix.Add(tok);
@@ -363,7 +363,7 @@ begin
   result:=true;
 end;
 
-function TjanSQLExpression2.Parse;
+function TjanSQLExpression2.Parse: boolean;
 var
   tokenizer:TjanSQLTokenizer;
 begin
@@ -515,7 +515,7 @@ end;
 procedure TjanSQLExpression2.runOperator(op:TTokenOperator);
 begin
   case op of
-    toString: procString;
+    TTokenOperator.toString: procString;
     toNumber: procNumber;
     toVariable: procVariable;
     toEq: procEq;
@@ -575,7 +575,7 @@ begin
   SP:=0;
   for i:=0 to c-1 do begin
     FPC:=i;
-    op:=TToken(FPostFix[i]).operator;
+    op:=TToken(FPostFix[i]).tokenoperator;
     try
       runoperator(op);
     except

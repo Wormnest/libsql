@@ -1,21 +1,14 @@
 { This file was automatically created by Lazarus. Do not edit!
-This source is only used to compile and install the package.
+  This source is only used to compile and install the package.
  }
 
-unit libsql; 
+unit libsql;
 
 interface
 
 uses
-  sqlcomponents, LazarusPackageIntf; 
+  libsqlite3, pasodbc, passql, passqlite, sqlsupport, utf8util, pasmysql;
 
 implementation
 
-procedure Register; 
-begin
-  RegisterUnit('sqlcomponents', @sqlcomponents.Register); 
-end; 
-
-initialization
-  RegisterPackage('libsql', @Register); 
 end.

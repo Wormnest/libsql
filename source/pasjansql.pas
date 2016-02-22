@@ -25,7 +25,9 @@ uses
      Windows,
      {$ENDIF}
      Classes, SysUtils,
+     {$IFNDEF FPC}
      janSQL,
+     {$ENDIF}
      passql,
      sqlsupport;
 

@@ -1,7 +1,10 @@
 syntax: glob
-bin
-**.~*
 
+bin
+**lib
+
+**.~*
+**bak
 **.cfg
 **.cnt
 **.dcu
@@ -10,3 +13,4 @@ bin
 **.dsk
 **.exe
 **.GID
+**.lps

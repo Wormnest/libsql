@@ -1,28 +1,53 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="2">
+  <Package Version="4">
     <Name Value="libsql"/>
+    <AddToProjectUsesSection Value="True"/>
     <CompilerOptions>
-      <Version Value="5"/>
+      <Version Value="11"/>
       <SearchPaths>
-        <OtherUnitFiles Value="jansql/"/>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(Target_OS)"/>
+        <OtherUnitFiles Value=".;../source"/>
+        <UnitOutputDirectory Value="../lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
-      <CodeGeneration>
-        <Generate Value="Faster"/>
-      </CodeGeneration>
-      <Other>
-        <CompilerPath Value="$(CompPath)"/>
-      </Other>
+      <Parsing>
+        <SyntaxOptions>
+          <SyntaxMode Value="Delphi"/>
+          <UseAnsiStrings Value="False"/>
+        </SyntaxOptions>
+      </Parsing>
     </CompilerOptions>
-    <Files Count="1">
+    <Description Value="LibSql Runtime package"/>
+    <Version Minor="75"/>
+    <Files Count="7">
       <Item1>
-        <Filename Value="sqlcomponents.pas"/>
-        <HasRegisterProc Value="True"/>
-        <UnitName Value="sqlcomponents"/>
+        <Filename Value="../source/libsqlite3.pas"/>
+        <UnitName Value="libsqlite3"/>
       </Item1>
+      <Item2>
+        <Filename Value="../source/pasodbc.pas"/>
+        <UnitName Value="pasodbc"/>
+      </Item2>
+      <Item3>
+        <Filename Value="../source/passql.pas"/>
+        <UnitName Value="passql"/>
+      </Item3>
+      <Item4>
+        <Filename Value="../source/passqlite.pas"/>
+        <UnitName Value="passqlite"/>
+      </Item4>
+      <Item5>
+        <Filename Value="../source/sqlsupport.pas"/>
+        <UnitName Value="sqlsupport"/>
+      </Item5>
+      <Item6>
+        <Filename Value="../source/utf8util.pas"/>
+        <UnitName Value="utf8util"/>
+      </Item6>
+      <Item7>
+        <Filename Value="../source/pasmysql.pas"/>
+        <UnitName Value="pasmysql"/>
+      </Item7>
     </Files>
-    <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">
       <Item1>
         <PackageName Value="LCL"/>

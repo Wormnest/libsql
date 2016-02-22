@@ -112,7 +112,7 @@ type
     property name:string read Fname write Setname;
     property value:variant read Fvalue write Setvalue;
     property tokenkind:TTokenKind read Ftokenkind write Settokenkind;
-    property operator: TTokenOperator read Foperator write Setoperator;
+    property tokenoperator: TTokenOperator read Foperator write Setoperator;
     property level:integer read Flevel write Setlevel;
     property expression:string read Fexpression write Setexpression;
   end;
@@ -172,7 +172,7 @@ begin
   tok.name:=FToken;
   tok.tokenkind:=FTokenKind;
   tok.value:=FTokenValue;
-  tok.operator:=FTokenOperator;
+  tok.tokenoperator:=FTokenOperator;
   tok.level:=FtokenLevel;
   tok.expression:=FTokenExpression;
   List.Add(tok);
@@ -215,7 +215,7 @@ begin
     inc(idx);
     FTokenValue:=FToken;
     FTokenKind:=tkOperand;
-    FTokenOperator:=toString;
+    FTokenOperator:=TTokenOperator.toString;
     result:=true;
   end
   else if bot=',' then begin
@@ -260,12 +260,12 @@ begin
     else if lowercase(FToken)='date' then begin
         FTokenKind:=tkOperand;
         FTokenValue:=sqldatestring;
-        FTokenOperator:=tostring;
+        FTokenOperator:=TTokenOperator.tostring;
     end
     else if lowercase(FToken)='time' then begin
         FTokenKind:=tkOperand;
         FTokenValue:=sqltimestring;
-        FTokenOperator:=tostring;
+        FTokenOperator:=TTokenOperator.tostring;
     end
     else if ISFunction(lowercase(FToken)) then begin
     end
@@ -801,7 +801,7 @@ begin
   result.name:=name;
   result.value:=value;
   result.tokenkind:=tokenkind;
-  result.operator:=operator;
+  result.tokenoperator:=tokenoperator;
   result.level:=level;
   result.expression:=expression;
 end;
