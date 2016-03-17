@@ -8,7 +8,7 @@
       <Version Value="11"/>
       <SearchPaths>
         <OtherUnitFiles Value="../source"/>
-        <UnitOutputDirectory Value="../lib/$(TargetCPU)-$(Target_OS)"/>
+        <UnitOutputDirectory Value="../lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Parsing>
         <SyntaxOptions>
