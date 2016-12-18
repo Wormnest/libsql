@@ -9,6 +9,10 @@ unit libsqlite3;
   {$ELSE}
     {$DEFINE UNIX}
   {$ENDIF}
+  {$IF CompilerVersion >= 12}
+    // Unicode strings
+    {$DEFINE WIDESTRING_DEFAULT}
+  {$ENDIF}
 {$ENDIF}
 
 //sqlite3.dll api interface
@@ -97,7 +101,7 @@ type PSQLite = Pointer;
      //untested:
      //procProgressCallback = procedure (UserData:Integer); cdecl;
      //untested:
-     //Tsqlite_create_function= function (db: Pointer; {const}zName:PChar; nArg: Integer;  xFunc : PSqlite_func{*,int,const char**};
+     //Tsqlite_create_function= function (db: Pointer; {const}zName:PAnsiChar; nArg: Integer;  xFunc : PSqlite_func{*,int,const char**};
      //  UserData: Integer):Integer; cdecl;
 
 //void *sqlite3_aggregate_context(sqlite3_context*, int nBytes);
@@ -133,15 +137,15 @@ The fifth parameter to sqlite3_bind_blob(), sqlite3_bind_text(), and sqlite3_bin
 
 The sqlite3_bind_*() routine must be called after sqlite3_prepare() or sqlite3_reset() and before sqlite3_step(). Bindings are not reset by the sqlite3_reset() routine. Unbound wildcards are interpreted as NULL.
 *)
-var SQLite3_Bind_Blob: function(hstatement: Pointer; iCol: integer; buf: PAnsiChar; n: integer; DestroyPtr: Pointer): integer; cdecl;  //Dak_Alpha
+var SQLite3_Bind_Blob: function(hstatement: Pointer; iCol: integer; buf: PByte; n: integer; DestroyPtr: Pointer): integer; cdecl;  //Dak_Alpha
 
 var SQLite3_BindParameterCount: function(hstatement: Pointer): Integer; cdecl;
-var SQLite3_BindParameterName: function(hstatement: Pointer; paramNo: Integer): PChar; cdecl;
+var SQLite3_BindParameterName: function(hstatement: Pointer; paramNo: Integer): PAnsiChar; cdecl;
 var SQLite3_BusyHandler: procedure(db: Pointer; CallbackPtr: Pointer; Sender: TObject); cdecl;
 var SQLite3_BusyTimeout: procedure(db: Pointer; TimeOut: Integer); cdecl;
 var SQLite3_Changes: function(db: Pointer): Integer; cdecl;
 var SQLite3_Close: function (db: Pointer): Integer; cdecl;
-//CollationFunction is defined as function ColFunc(pCollNeededArg: Pointer; db: Pointer; eTextRep: Integer; CollSeqName: PChar): Pointer;
+//CollationFunction is defined as function ColFunc(pCollNeededArg: Pointer; db: Pointer; eTextRep: Integer; CollSeqName: PAnsiChar): Pointer;
 //pCollNeededArg <- what is that?
 var SQlite_Collation_Needed: function(db: Pointer; pCollNeededArg: Pointer; CollationFunctionPtr: Pointer): Integer; cdecl;
 var SQlite_Collation_Needed16: function(db: Pointer; pCollNeededArg: Pointer; CollationFunctionPtr: Pointer): Integer; cdecl;
@@ -152,12 +156,12 @@ var SQLite3_Column_Count: function(hstatement: Pointer): Integer; cdecl;
 var SQLite3_Column_Double: function(hstatement: Pointer; iCol: Integer): Double; cdecl;
 var SQLite3_Column_Int: function(hstatement: Pointer; iCol: Integer): Integer; cdecl;
 var SQLite3_Column_Int64: function(hstatement: Pointer; iCol: Integer): Int64; cdecl;
-var SQLite3_Column_Text: function(hstatement: Pointer; iCol: Integer): PChar; cdecl;
+var SQLite3_Column_Text: function(hstatement: Pointer; iCol: Integer): PAnsiChar; cdecl;
 var SQLite3_Column_Text16: function(hstatement: Pointer; iCol: Integer): PWChar; cdecl;
 var SQLite3_Column_Type: function(hstatement: Pointer; iCol: Integer): Integer; cdecl;
-var SQLite3_Column_Decltype: function(hstatement: Pointer; iCol: Integer): PChar; cdecl;
+var SQLite3_Column_Decltype: function(hstatement: Pointer; iCol: Integer): PAnsiChar; cdecl;
 var SQLite3_Column_Decltype16: function (hstatement: Pointer; colNo: Integer): PWChar; cdecl;
-var SQLite3_Column_Name: function(hstatement: Pointer; iCol: Integer): PChar; cdecl;
+var SQLite3_Column_Name: function(hstatement: Pointer; iCol: Integer): PAnsiChar; cdecl;
 var SQLite3_Column_Name16: function (hstatement: Pointer; colNo: Integer): PWChar; cdecl;
 {void *sqlite3_commit_hook(sqlite3*, int(*xCallback)(void*), void *pArg);}
 (*
@@ -169,7 +173,7 @@ If another function was previously registered, its pArg value is returned. Other
 
 Registering a NULL function disables the callback. Only a single commit hook callback can be registered at a time.
 *)
-var SQLite3_Complete: function(const sql: PChar): Integer; cdecl;
+var SQLite3_Complete: function(const sql: PAnsiChar): Integer; cdecl;
 var SQLite3_Complete16: function(const sql: PWChar): Integer; cdecl;
 //CompareFunction is defined as function ComFunc(pCtx: Pointer; str1Length: Integer; str1: PWChar; str2Length: Integer; str2: PWChar): Pointer;
 //pCtx <- what is that?
@@ -181,13 +185,13 @@ var SQLite3_Complete16: function(const sql: PWChar): Integer; cdecl;
     lpString1: PWideChar; cchCount1: Integer;
     lpString2: PWideChar; cchCount2: Integer): Integer stdcall;}
     user: pointer;
-    lenA: Integer; A: pChar;
-    lenB: Integer; B: pChar): Integer; stdcall; //cdecl;*)
+    lenA: Integer; A: PAnsiChar;
+    lenB: Integer; B: PAnsiChar): Integer; stdcall; //cdecl;*)
 // EINDE JGB
 
-var SQLite3_Create_Collation: function(db: Pointer; CollName: PChar; eTextRep: Integer; pCtx: Pointer; compareFuncPtr: Pointer): Integer; cdecl;
+var SQLite3_Create_Collation: function(db: Pointer; CollName: PAnsiChar; eTextRep: Integer; pCtx: Pointer; compareFuncPtr: Pointer): Integer; cdecl;
 // JGB AANGEPAST:
-//var SQLite3_Create_Collation: function(db: Pointer; CollName: PChar; eTextRep: Integer; pCtx: Pointer; compareFuncPtr: TCompareStringFunc): Integer; cdecl;
+//var SQLite3_Create_Collation: function(db: Pointer; CollName: PAnsiChar; eTextRep: Integer; pCtx: Pointer; compareFuncPtr: TCompareStringFunc): Integer; cdecl;
 var SQLite3_Create_Collation16: function(db: Pointer; CollName: PWChar; eTextRep: Integer; pCtx: Pointer; compareFuncPtr: Pointer): Integer; cdecl;
 
 type TSQLFunction = procedure (sqlite3_context: Pointer; nArg: Integer;sqlite3_value: Pointer); cdecl;
@@ -213,16 +217,16 @@ The sixth, seventh and eighth, xFunc, xStep and xFinal, are pointers to user imp
 *)
 var SQLite3_Data_Count: function(hstatement: Pointer): Integer; cdecl;
 var SQLite3_ErrCode: function(db: Pointer): Integer; cdecl;
-var SQLite3_ErrorMsg: function(db : Pointer): PChar; cdecl;
+var SQLite3_ErrorMsg: function(db : Pointer): PAnsiChar; cdecl;
 var SQLite3_ErrorMsg16: function(db : Pointer): PWChar; cdecl;
-var SQLite3_Exec: function(db: Pointer; SQLStatement: PChar; CallbackPtr: Pointer; Sender: TObject; var ErrMsg: PChar): Integer; cdecl;
+var SQLite3_Exec: function(db: Pointer; SQLStatement: PAnsiChar; CallbackPtr: Pointer; Sender: TObject; var ErrMsg: PAnsiChar): Integer; cdecl;
 var SQLite3_Finalize: function(hstatement: Pointer): Integer; cdecl;
-var SQLite3_Free: procedure(P: PChar); cdecl;
-var SQLite3_GetTable: function(db: Pointer; SQLStatement: PChar; var ResultPtr: Pointer; var RowCount: Integer; var ColCount: Integer; var ErrMsg: PChar): Integer; cdecl;
-var SQLite3_FreeTable: procedure(Table: PChar); cdecl;
+var SQLite3_Free: procedure(P: PAnsiChar); cdecl;
+var SQLite3_GetTable: function(db: Pointer; SQLStatement: PAnsiChar; var ResultPtr: Pointer; var RowCount: Integer; var ColCount: Integer; var ErrMsg: PAnsiChar): Integer; cdecl;
+var SQLite3_FreeTable: procedure(Table: PAnsiChar); cdecl;
 var SQLite3_Interrupt: procedure(db : Pointer); cdecl;
 var SQLite3_LastInsertRowId: function(db: Pointer): Int64; cdecl;
-var SQLite3_LibVersion: function(): PChar; cdecl;
+var SQLite3_LibVersion: function(): PAnsiChar; cdecl;
 
 {char *sqlite3_mprintf(const char*,...);
 char *sqlite3_vmprintf(const char*, va_list);
@@ -256,9 +260,9 @@ This is correct. Had we used %s instead of %q, the generated SQL would have look
 
 This second example is an SQL syntax error. As a general rule you should always use %q instead of %s when inserting text into a string literal.
 *)
-var SQLite3_Open: function(dbName: PChar; var db: Pointer): Integer; cdecl;
+var SQLite3_Open: function(dbName: PAnsiChar; var db: Pointer): Integer; cdecl;
 var SQLite3_Open16: function(dbName: PWChar; var db: Pointer): Integer; cdecl;
-var SQLite3_Prepare: function(db: Pointer; SQLStatement: PChar; SQLLength: Integer; var hstatement: Pointer; var Tail: pointer): Integer; cdecl;
+var SQLite3_Prepare: function(db: Pointer; SQLStatement: PAnsiChar; SQLLength: Integer; var hstatement: Pointer; var Tail: pointer): Integer; cdecl;
 var SQLite3_Prepare16: function(db: Pointer; SQLStatement: PWChar; SQLLength: Integer; var hstatement: Pointer; var Tail: pointer): Integer; cdecl;
 {void sqlite3_progress_handler(sqlite3*, int, int(*)(void*), void*);}
 (* Experimental
@@ -389,7 +393,7 @@ implementation
 
 {$IFDEF FPC}
 //FPC Support function helping typecasting:
-function GetProcAddress(hModule: HMODULE; lpProcName: PChar): Pointer;
+function GetProcAddress(hModule: HMODULE; lpProcName: PAnsiChar): Pointer;
 begin
   Result := GetProcedureAddress(hModule, lpProcName);
 end;
@@ -407,12 +411,16 @@ begin
   else
     libname := libraryName;
 
-//  DLLHandle := GetModuleHandle(PChar(libraryName));
-//  DLLHandle := LoadLibrary(PChar(libName));
+//  DLLHandle := GetModuleHandle(PAnsiChar(libraryName));
+//  DLLHandle := LoadLibrary(PAnsiChar(libName));
   {$IFDEF FPC}
   DLLHandle := LoadLibrary(libname);
   {$ELSE}
-  DLLHandle := LoadLibrary(PChar(libname));
+  {$IFNDEF WIDESTRING_DEFAULT}
+  DLLHandle := LoadLibrary(PAnsiChar(libname));
+  {$ELSE}
+  DLLHandle := LoadLibrary(PWideChar(libname));
+  {$ENDIF}
   {$ENDIF}
   {$IFNDEF WIN32}
       // try other possible library name
@@ -421,7 +429,11 @@ begin
          {$IFDEF FPC}
          DLLHandle := LoadLibrary(libname);
          {$ELSE}
-         DLLHandle := LoadLibrary(PChar(libname));
+         {$IFNDEF WIDESTRING_DEFAULT}
+         DLLHandle := LoadLibrary(PAnsiChar(libname));
+         {$ELSE}
+         DLLHandle := LoadLibrary(PWideChar(libname));
+         {$ENDIF}
          {$ENDIF}
       end;
   {$ENDIF}

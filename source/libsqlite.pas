@@ -9,6 +9,10 @@ unit libsqlite;
   {$ELSE}
     {$DEFINE UNIX}
   {$ENDIF}
+  {$IF CompilerVersion >= 12}
+    // Unicode strings
+    {$DEFINE WIDESTRING_DEFAULT}
+  {$ENDIF}
 {$ENDIF}
 
 //libsql.dll api interface
@@ -63,7 +67,7 @@ const
 
 
 
-  SQLITEDLL: PChar  = {$IFDEF LINUX}'libsqlite.so'{$ENDIF}{$IFDEF WIN32}'sqlite.dll'{$ENDIF}{$IFDEF darwin}'libsqlite.dylib'{$ENDIF};
+  SQLITEDLL: PAnsiChar  = {$IFDEF LINUX}'libsqlite.so'{$ENDIF}{$IFDEF WIN32}'sqlite.dll'{$ENDIF}{$IFDEF darwin}'libsqlite.dylib'{$ENDIF};
 
 function LoadLibSqlite2 (var LibraryPath: String): Boolean;
 
@@ -77,20 +81,20 @@ type PSQLite = Pointer;
      //untested:
      procProgressCallback = procedure (UserData:Integer); cdecl;
      //untested:
-     Tsqlite_create_function= function (db: Pointer; {const}zName:PChar; nArg: Integer;  xFunc : PSqlite_func{*,int,const char**};
+     Tsqlite_create_function= function (db: Pointer; {const}zName:PAnsiChar; nArg: Integer;  xFunc : PSqlite_func{*,int,const char**};
        UserData: Integer):Integer; cdecl;
 
 var
-  SQLite_Open: function(dbname: PChar; mode: Integer; var ErrMsg: PChar): Pointer; cdecl;
+  SQLite_Open: function(dbname: PAnsiChar; mode: Integer; var ErrMsg: PAnsiChar): Pointer; cdecl;
   SQLite_Close: procedure(db: Pointer); cdecl;
-  SQLite_Exec: function(db: Pointer; SQLStatement: PChar; CallbackPtr: Pointer; Sender: TObject; var ErrMsg: PChar): integer; cdecl;
-  SQLite_Version: function(): PChar; cdecl;
-  SQLite_Encoding: function(): PChar; cdecl;
-  SQLite_ErrorString: function(ErrNo: Integer): PChar; cdecl;
-  SQLite_GetTable: function(db: Pointer; SQLStatement: PChar; var ResultPtr: Pointer; var RowCount: Cardinal; var ColCount: Cardinal; var ErrMsg: PChar): integer; cdecl;
-  SQLite_FreeTable: procedure(Table: PChar); cdecl;
-  SQLite_FreeMem: procedure(P: PChar); cdecl;
-  SQLite_Complete: function(P: PChar): boolean; cdecl;
+  SQLite_Exec: function(db: Pointer; SQLStatement: PAnsiChar; CallbackPtr: Pointer; Sender: TObject; var ErrMsg: PAnsiChar): integer; cdecl;
+  SQLite_Version: function(): PAnsiChar; cdecl;
+  SQLite_Encoding: function(): PAnsiChar; cdecl;
+  SQLite_ErrorString: function(ErrNo: Integer): PAnsiChar; cdecl;
+  SQLite_GetTable: function(db: Pointer; SQLStatement: PAnsiChar; var ResultPtr: Pointer; var RowCount: Cardinal; var ColCount: Cardinal; var ErrMsg: PAnsiChar): integer; cdecl;
+  SQLite_FreeTable: procedure(Table: PAnsiChar); cdecl;
+  SQLite_FreeMem: procedure(P: PAnsiChar); cdecl;
+  SQLite_Complete: function(P: PAnsiChar): boolean; cdecl;
   SQLite_LastInsertRow: function(db: Pointer): integer; cdecl;
   SQLite_Cancel: procedure(db: Pointer); cdecl;
 
@@ -125,10 +129,10 @@ int sqlite_finalize(
 
   sqlite_compile: function(
     db: Pointer;             //* The open database */
-    Sql: PChar;              //* SQL statement to be compiled */
-    var Tail: PChar;         //* OUT: uncompiled tail of zSql */
+    Sql: PAnsiChar;              //* SQL statement to be compiled */
+    var Tail: PAnsiChar;         //* OUT: uncompiled tail of zSql */
     var Vm: Pointer;         //* OUT: the virtual machine to execute zSql */
-    var Errmsg: PChar        //* OUT: Error message. */
+    var Errmsg: PAnsiChar        //* OUT: Error message. */
   ): Integer; cdecl;
 
   sqlite_step: function(
@@ -140,7 +144,7 @@ int sqlite_finalize(
 
   sqlite_finalize: function(
     Vm: Pointer;             //* The virtual machine to be finalized */
-    var ErrMsg: PChar        //* OUT: Error message */
+    var ErrMsg: PAnsiChar        //* OUT: Error message */
   ): Integer; cdecl;
 
 
@@ -169,7 +173,11 @@ begin
   {$IFDEF FPC}
   DLLHandle := LoadLibrary(libname);
   {$ELSE}
-  DLLHandle := LoadLibrary(PChar(libname));
+  {$IFNDEF WIDESTRING_DEFAULT}
+  DLLHandle := LoadLibrary(PAnsiChar(libname));
+  {$ELSE}
+  DLLHandle := LoadLibrary(PWideChar(libname));
+  {$ENDIF}
   {$ENDIF}
   {$IFNDEF WIN32}
       // try other possible library name
@@ -178,7 +186,11 @@ begin
          {$IFDEF FPC}
          DLLHandle := LoadLibrary(libname);
          {$ELSE}
-         DLLHandle := LoadLibrary(PChar(libname));
+         {$IFNDEF WIDESTRING_DEFAULT}
+         DLLHandle := LoadLibrary(PAnsiChar(libname));
+         {$ELSE}
+         DLLHandle := LoadLibrary(PWideChar(libname));
+         {$ENDIF}
          {$ENDIF}
       end;
   {$ENDIF}

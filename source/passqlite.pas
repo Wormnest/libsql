@@ -48,7 +48,7 @@ uses
 
 type
   TSQLiteExecCallback = function(Sender: TObject; Columns: Integer; ColumnValues: Pointer; ColumnNames: Pointer): integer of object; cdecl;
-  TSQLiteBusyCallback = function(Sender: TObject; ObjectName: PChar; BusyCount: integer): integer of object; cdecl;
+  TSQLiteBusyCallback = function(Sender: TObject; ObjectName: PAnsiChar; BusyCount: integer): integer of object; cdecl;
   TOnData = Procedure(Sender: TObject; Columns: Integer; ColumnNames, ColumnValues: String) of object;
   TOnBusy = Procedure(Sender: TObject; ObjectName: String; BusyCount: integer; var Cancel: Boolean) of object;
   TOnQueryComplete = Procedure(Sender: TObject) of object;
@@ -159,7 +159,7 @@ type
     procedure FreeResult (Handle: THandle); override;
 
     function Use (Database:String):Boolean; override;
-    procedure SetDataBase (Database:String); override;
+    procedure SetDatabase (Database:String); override;
     function Connect (Host, User, Pass:String; DataBase:String=''):Boolean; override;
     procedure Close; override;
     procedure StartTransaction; override;
@@ -280,7 +280,7 @@ end;
 
 function QueryCallback(Sender: TObject; Columns: Integer; ColumnValues: Pointer; ColumnNames: Pointer): integer; cdecl;
 var S:TResultRow;
-    FieldNames, Value:^PChar;
+    FieldNames, Value:^PAnsiChar;
     i,j:Integer;
 begin
   //nice, we got a row. get it.
@@ -382,7 +382,7 @@ begin
 end;
 
 
-function QueryBusyCallback(Sender: TObject; ObjectName: PChar; BusyCount: integer): integer; cdecl;
+function QueryBusyCallback(Sender: TObject; ObjectName: PAnsiChar; BusyCount: integer): integer; cdecl;
 begin
 (*  with TLiteDB(Sender) do
     begin
@@ -420,7 +420,7 @@ begin
 end;
 
 function TLiteDB.Query(SQL: String): Boolean;
-var P,Q:PChar;
+var P,Q:PAnsiChar;
     i:Integer;
 begin
   if (not FCallBackOnly) and(Fsv = sv3) then // new method break callbackonly-onFetchRow processing
@@ -471,13 +471,13 @@ begin
           case Fsv of
             sv2:
               begin
-                FLastError := SQLite_exec (FBaseInfo.FHandle, PChar(SQL), @QueryCallBack, Self, P);
+                FLastError := SQLite_exec (FBaseInfo.FHandle, PAnsiChar(SQL), @QueryCallBack, Self, P);
                 FLastErrorText := StrPas (P);
                 SQLite_freemem(P);
               end;
             sv3:
               begin
-                FLastError := SQLite3_exec (FBaseInfo.FHandle, PChar(SQL), @QueryCallBack, Self, Q);
+                FLastError := SQLite3_exec (FBaseInfo.FHandle, PAnsiChar(SQL), @QueryCallBack, Self, Q);
                 if FLastError<>0 then
                   FLastErrorText := SQLite3_errormsg (FBaseInfo.FHandle)
                 else
@@ -585,7 +585,7 @@ begin
       FQuerySize := 0;
       if SQL<>'' then  //calling with empty string causes a result cleanup.
         begin
-          //FLastError := SQLite3_exec (FBaseInfo.FHandle, PChar(SQL), @QueryCallBack, Self, P)
+          //FLastError := SQLite3_exec (FBaseInfo.FHandle, PAnsiChar(SQL), @QueryCallBack, Self, P)
           //We run 16-bit sqlite functions ourselves here
           FLastError := SQLite3_prepare16(FBaseInfo.FHandle, PWChar(SQL), length (SQL) * 2, S, Q);
           if FLastError = SQLite_OK then
@@ -666,7 +666,7 @@ end;
 function TLiteDB.Use (Database: String): Boolean;
 var B:TBaseInfo;
     i:Integer;
-    P:PChar;
+    P:PAnsiChar;
     FS: TFileStream;
     Header: String;
     FLastError: Integer;                                      //Dak_Alpha
@@ -755,7 +755,7 @@ begin
                 DataBases.Delete(i);
               end;
           end;
-      if Assigned(FOnClose) then FOnClose(Self);          
+      if Assigned(FOnClose) then FOnClose(Self);
     end;
 
   if (Database<>'') and (DataBases.IndexOf(DataBase)<0) then
@@ -764,13 +764,13 @@ begin
       DataBases.AddObject(DataBase, B);
       inc (B.ReferenceCount);
       case Fsv of
-        sv2: B.FHandle := SQLite_open(PChar (DataBase), 1, P);
+        sv2: B.FHandle := SQLite_open(PAnsiChar (DataBase), 1, P);
         sv3:
           begin
             if FUniCode then
               FLastError := SQLite3_open16(PWChar (DecodeUTF8(DataBase)), B.FHandle)
             else
-              FLastError := SQLite3_open(PChar (DataBase), B.FHandle);
+              FLastError := SQLite3_open(PAnsiChar (DataBase), B.FHandle);
             if FLastError <> SQLite_OK then
             begin
               P := SQLite3_errormsg(B.FHandle);
@@ -834,7 +834,7 @@ end;
 
 
 function TLiteDB.GetErrorMessageW: WideString;
-var P: PChar;
+var P: PAnsiChar;
 begin
   Result := '';
   if FCurrentSet.FLastError = 0 then
@@ -1046,7 +1046,7 @@ begin
 end;
 
 function TLiteDB.Execute2(SQL: String): THandle;
-var Tail, ErrMsg: PChar;
+var Tail, ErrMsg: PAnsiChar;
     VM: Pointer;
     res: Integer;
 begin
@@ -1059,7 +1059,7 @@ begin
       VM := nil;
       Tail := nil;
       ErrMsg := nil;
-      res := sqlite_compile (FBaseInfo.FHandle, PChar(SQL), Tail, VM, ErrMsg);
+      res := sqlite_compile (FBaseInfo.FHandle, PAnsiChar(SQL), Tail, VM, ErrMsg);
       if res=0 then
         UseResultSet (Integer(VM))
       else
@@ -1100,8 +1100,8 @@ begin
       Clear;
       VM := nil;
       Tail := nil;
-      //res := sqlite_compile (FBaseInfo.FHandle, PChar(SQL), Tail, VM, ErrMsg);
-      res := sqlite3_prepare (FBaseInfo.FHandle, PChar(SQL), Length(SQL), VM, Tail);
+      //res := sqlite_compile (FBaseInfo.FHandle, PAnsiChar(SQL), Tail, VM, ErrMsg);
+      res := sqlite3_prepare (FBaseInfo.FHandle, PAnsiChar(SQL), Length(SQL), VM, Tail);
       if res=0 then
         UseResultSet (Integer(VM))
       else
@@ -1138,7 +1138,7 @@ begin
       Clear;
       VM := nil;
       Tail := nil;
-      //res := sqlite_compile (FBaseInfo.FHandle, PChar(SQL), Tail, VM, ErrMsg);
+      //res := sqlite_compile (FBaseInfo.FHandle, PAnsiChar(SQL), Tail, VM, ErrMsg);
       res := sqlite3_prepare16 (FBaseInfo.FHandle, PWChar(SQL), Length(SQL), VM, Tail);
       if res=0 then
         UseResultSet (Integer(VM))
@@ -1165,8 +1165,8 @@ end;
 
 function TLiteDB.FetchRow2(Handle: THandle; var row: TResultRow): Boolean;
 var N: Integer;
-    Values: ^PChar;
-    Names: ^PChar;
+    Values: ^PAnsiChar;
+    Names: ^PAnsiChar;
     i,j: Integer;
 begin
 //take care on queries that modify the database
@@ -1253,7 +1253,7 @@ begin
 end;
 
 procedure TLiteDB.FreeResult2(Handle: THandle);
-var Err: PChar;
+var Err: PAnsiChar;
 begin
   if Handle <> 0 then
     begin
@@ -1309,7 +1309,7 @@ end;
 
 procedure TLiteDB.StoreRow3(row: TResultRow; Stmt: Pointer; Wide: Boolean; var QS: Integer);
 var
-    Value: String; //^PChar;
+    Value: String; //^PAnsiChar;
     ValueW: WideString;
     i:Integer;
     Columns: Integer;
@@ -1372,7 +1372,7 @@ var
   ResultPtr: Pointer;
   ResultStr: ^Pointer;
   RowCount, ColCount: Integer;
-  ErrMsg: PChar;
+  ErrMsg: PAnsiChar;
 begin
   if FActive and Assigned(FBaseInfo.FHandle) then
     begin
@@ -1429,7 +1429,7 @@ var
   ResultPtr: Pointer;
   ResultStr: ^Pointer;
   RowCount, ColCount: Integer;
-  ErrMsg: PChar;
+  ErrMsg: PAnsiChar;
 begin
   Result := False;
   if FActive and Assigned(FBaseInfo.FHandle) then
@@ -1646,7 +1646,7 @@ end;
 {Params is List of TMemoryStream blob objects!}
 function TLiteDB.Query3(SQL: String; Params: TList = nil): Boolean;
 var
-  SQLStatement,TmpSQL: PAnsiChar;
+  SQLStatement,TmpSQL: PChar;
   Stmt: Pointer;
   sr: Integer;
   Tail: Pointer;
@@ -1680,13 +1680,17 @@ begin
           SQL:=FSQL;
         end;
 
-      SQLStatement := PAnsiChar(SQL);
+      SQLStatement := PChar(SQL);
 
       repeat
         try
           TmpSQL := SQLStatement;
 
+          {$IF CompilerVersion >= 20} // Unicode by default, use the widechar version
+          FLastError := SQLite3_prepare16(FBaseInfo.FHandle, SQLStatement, -1, Stmt, Tail{SQLStatement});
+          {$ELSE}
           FLastError := SQLite3_prepare(FBaseInfo.FHandle, SQLStatement, -1, Stmt, Tail{SQLStatement});
+          {$ENDIF}
           if FLastError = SQLite_OK then
           begin
 
@@ -1706,10 +1710,14 @@ begin
                   MStream := TObject(Params.Items[BindOffset]);
                   if (MStream is TMemoryStream) then
                   begin
-                    FLastError := SQLite3_Bind_Blob(Stmt, i+1, PChar(TMemoryStream(MStream).Memory), TMemoryStream(MStream).Size, nil);
+                    FLastError := SQLite3_Bind_Blob(Stmt, i+1, TMemoryStream(MStream).Memory, TMemoryStream(MStream).Size, nil);
                     if FLastError <> SQLite_OK then
                     begin
+                      {$IF CompilerVersion >= 20} // Unicode by default, use the widechar version
+                      FLastErrorText := SQLite3_errormsg16(FBaseInfo.FHandle);
+                      {$ELSE}
                       FLastErrorText := SQLite3_errormsg(FBaseInfo.FHandle);
+                      {$ENDIF}
                       Break;
                     end;
                     Inc(BindOffset);
@@ -1742,7 +1750,7 @@ begin
             end;
 
             //Store ResultSet only if last query is executed
-            if PAnsiChar(Tail)^ = #0 then
+            if PChar(Tail)^ = #0 then
             begin
               Clear;
               FSQL := string(TmpSQL);
@@ -1780,7 +1788,11 @@ begin
 
             if sr in [SQLITE_ERROR, SQLITE_MISUSE] then
             begin
+              {$IF CompilerVersion >= 20} // Unicode by default, use the widechar version
+              FLastErrorText := SQLite3_errormsg16(FBaseInfo.FHandle);
+              {$ELSE}
               FLastErrorText := SQLite3_errormsg(FBaseInfo.FHandle);
+              {$ENDIF}
               FLastError := SQLite3_errcode(FBaseInfo.FHandle);
               FRowsAffected := 0;
               FLastInsertID := 0;
@@ -1799,7 +1811,11 @@ begin
           end
           else
           begin
+            {$IF CompilerVersion >= 20} // Unicode by default, use the widechar version
+            FLastErrorText := SQLite3_errormsg16(FBaseInfo.FHandle);
+            {$ELSE}
             FLastErrorText := SQLite3_errormsg(FBaseInfo.FHandle);
+            {$ENDIF}
             FLastError := SQLite3_errcode(FBaseInfo.FHandle);
             Result := False;
             FHasResult := False;
@@ -1968,8 +1984,8 @@ end;
 
 //16-1-2008
 function SqlCompareFunc( user: pointer;
-                lenA: Integer; A: pChar;
-                lenB: Integer; B: pChar): Integer; stdcall; //cdecl;
+                lenA: Integer; A: PAnsiChar;
+                lenB: Integer; B: PAnsiChar): Integer; stdcall; //cdecl;
 var S1, S2: string;
     i: Integer;
     function MyCompareText(s1,s2: AnsiString): Integer;

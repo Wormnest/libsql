@@ -252,6 +252,7 @@ begin
   Param.Command := lcUse;
   Param.Param := Database;
   RunAndWait;
+  Result := True; // For now always return true to remove warning of undefined result
 end;
 
 { TSqliteDBThread }

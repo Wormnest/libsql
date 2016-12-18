@@ -3,6 +3,11 @@ unit passql;
 {$IFDEF FPC}
 {$MODE DELPHI}
 {$H+}
+{$ELSE}
+  {$IF CompilerVersion >= 22}
+    // Starting with VER220 = CompilerVersion 22 = XE FormatSettings is defined.
+    {$DEFINE HAS_FORMATSETTINGS}
+  {$ENDIF}
 {$ENDIF}
 
 {$IFDEF LINUX}
@@ -402,8 +407,8 @@ type
     function GetErrorMessage:String; virtual;
 
     //typical mysql
-    procedure SetDataBase (Database:String); virtual;
-    procedure SetDataBaseW (Database: WideString); virtual;
+    procedure SetDatabase (Database:String); virtual;
+    procedure SetDatabaseW (Database: WideString); virtual;
     procedure SetPort (Port:Integer); virtual;
 
     //all these functions call query or operate on a Query result set.
@@ -566,7 +571,11 @@ end;
 function TResultCell.GetFloat: Extended;
 begin
   try
+    {$IFDEF HAS_FORMATSETTINGS}
+    Result := StrToFloat (StringReplace (FValue, '.', FormatSettings.DecimalSeparator, []));
+    {$ELSE}
     Result := StrToFloat (StringReplace (FValue, '.', DecimalSeparator, []));
+    {$ENDIF HAS_FORMATSETTINGS}
   except
     Result := 0;
   end;
