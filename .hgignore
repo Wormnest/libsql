@@ -14,3 +14,6 @@ bin
 **.exe
 **.GID
 **.lps
+**.local
+**.identcache
+**.stat
