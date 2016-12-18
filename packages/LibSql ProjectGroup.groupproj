@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{8B2F16F8-81BD-4EDE-A0C9-EF553E5B8F6A}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="LibSql_D24R.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="LibSql_D24R">
+        <MSBuild Projects="LibSql_D24R.dproj"/>
+    </Target>
+    <Target Name="LibSql_D24R:Clean">
+        <MSBuild Projects="LibSql_D24R.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LibSql_D24R:Make">
+        <MSBuild Projects="LibSql_D24R.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="LibSql_D24R"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="LibSql_D24R:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="LibSql_D24R:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

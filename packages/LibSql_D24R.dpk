@@ -1,0 +1,47 @@
+package LibSql_D24R;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$RUNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl;
+
+contains
+  libsqlite3 in '..\source\libsqlite3.pas',
+  pasmysql in '..\source\pasmysql.pas',
+  passql in '..\source\passql.pas',
+  passqlite in '..\source\passqlite.pas',
+  sqlsupport in '..\source\sqlsupport.pas',
+  utf8util in '..\source\utf8util.pas',
+  libmysql in '..\source\libmysql.pas',
+  libodbc32 in '..\source\libodbc32.pas',
+  libsqlite in '..\source\libsqlite.pas',
+  pasodbc in '..\source\pasodbc.pas',
+  pasthreadedsqlite in '..\source\pasthreadedsqlite.pas';
+
+end.
