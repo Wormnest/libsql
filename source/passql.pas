@@ -4,6 +4,10 @@ unit passql;
 {$MODE DELPHI}
 {$H+}
 {$ELSE}
+  {$IF CompilerVersion >= 12}
+    // Unicode strings
+    {$DEFINE WIDESTRING_DEFAULT}
+  {$ENDIF}
   {$IF CompilerVersion >= 22}
     // Starting with VER220 = CompilerVersion 22 = XE FormatSettings is defined.
     {$DEFINE HAS_FORMATSETTINGS}
@@ -1988,10 +1992,18 @@ begin
                 else
                   exit; //illegal format
               end;
+{$IFDEF WIDESTRING_DEFAULT}
+            vtString, vtUnicodeString:
+{$ELSE}
             vtString:
+{$ENDIF}
               begin
                 if c in ['S', 'Q', 'Z', 'U', 'X', 'A'] then
+{$IFDEF WIDESTRING_DEFAULT}
+                  p :=  String(VUnicodeString)
+{$ELSE}
                   p :=  String(VString^)
+{$ENDIF}
                 else
                 if c in ['W'] then
                   begin
@@ -2043,7 +2055,11 @@ begin
                 else
                   exit; //illegal format
               end;
+{$IFDEF WIDESTRING_DEFAULT}
             vtWideString:
+{$ELSE}
+            vtWideString, vtUnicodeString:
+{$ENDIF}
               begin
                 if c in ['S', 'W', 'Q', 'Z', 'U', 'A'] then
                   pw := WideString(VWideString)
@@ -2073,8 +2089,9 @@ begin
                 else
                   exit; //illegal format
               end;
-            else
-              exit;
+          else
+            // We need to know about variants we don't handle yet.
+            raise Exception.Create('_FormatSql: Unexpected variant type!');
           end; //case
 
         //rules:

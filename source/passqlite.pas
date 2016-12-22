@@ -9,6 +9,10 @@ unit passqlite;
   {$ELSE}
     {$DEFINE UNIX}
   {$ENDIF}
+  {$IF CompilerVersion >= 12}
+    // Unicode strings
+    {$DEFINE WIDESTRING_DEFAULT}
+  {$ENDIF}
 {$ENDIF}
 
 { $DEFINE SQLITE3_STATIC}
@@ -666,9 +670,10 @@ end;
 function TLiteDB.Use (Database: String): Boolean;
 var B:TBaseInfo;
     i:Integer;
-    P:PAnsiChar;
+    P:PChar;
+    PA: PAnsiChar;
     FS: TFileStream;
-    Header: String;
+    Header: AnsiString;  // Needs to be Ansi since that's what the header of a sqlite file uses
     FLastError: Integer;                                      //Dak_Alpha
 begin
   Result := False;
@@ -764,16 +769,32 @@ begin
       DataBases.AddObject(DataBase, B);
       inc (B.ReferenceCount);
       case Fsv of
-        sv2: B.FHandle := SQLite_open(PAnsiChar (DataBase), 1, P);
+        sv2:
+          begin
+            B.FHandle := SQLite_open(PAnsiChar (DataBase), 1, PA);
+{$IFDEF WIDESTRING_DEFAULT}
+            P := PWideChar(PA);
+{$ELSE}
+            P := PA;
+{$ENDIF}
+          end;
         sv3:
           begin
             if FUniCode then
               FLastError := SQLite3_open16(PWChar (DecodeUTF8(DataBase)), B.FHandle)
             else
+{$IFDEF WIDESTRING_DEFAULT}
+              FLastError := SQLite3_open16(PChar(DataBase), B.FHandle);
+{$ELSE}
               FLastError := SQLite3_open(PAnsiChar (DataBase), B.FHandle);
+{$ENDIF}
             if FLastError <> SQLite_OK then
             begin
+{$IFDEF WIDESTRING_DEFAULT}
+              P := SQLite3_errormsg16(B.FHandle);
+{$ELSE}
               P := SQLite3_errormsg(B.FHandle);
+{$ENDIF}
               SQLite3_Close(B.FHandle);                                            //Dak_Alpha
               b.FHandle := nil;                                                    //Dak_Alpha
             end;
@@ -1337,7 +1358,12 @@ begin
                   end
                 else
                   begin
+{$IF CompilerVersion >= 12}
+// Unicode strings
+                    Value := SQLite3_Column_Text16(stmt, i);
+{$ELSE}
                     Value := SQLite3_Column_Text(stmt, i);
+{$ENDIF}
                     row.FNulls.Add(Pointer(0));
                     row.Add (Value);
                     inc (QS, length(Value));
