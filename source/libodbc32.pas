@@ -16,6 +16,8 @@ interface
 //but you may get it to work, for example using IODBC.org
 //debain has package IODCB.
 
+// TODO: This needs changes for 64 bits!
+
 {$IFNDEF FPC}
   {$IFDEF LINUX} //Kylix
   {$DEFINE UNIX}
@@ -228,7 +230,7 @@ type
   SQLSMALLINT  = smallint;
   SQLUSMALLINT = Word;
   SQLRETURN    = SQLSMALLINT;
-  SQLHANDLE    = LongInt;
+  SQLHANDLE    = NativeInt;
   SQLHENV      = SQLHANDLE;
   SQLHDBC      = SQLHANDLE;
   SQLHSTMT     = SQLHANDLE;
@@ -313,7 +315,7 @@ type
   TSQLFreeConnect=function (hdbc:LongInt) :Smallint;{$IFDEF LINUX}cdecl{$ELSE}stdcall{$ENDIF};
   TSQLConnect=function (hdbc:Integer; szDSN:PCHAR; cbDSN:Smallint; szUID:PCHAR; cbUID:Smallint; szAuthStr:PCHAR; cbAuthStr:Smallint) :Smallint;{$IFDEF LINUX}cdecl{$ELSE}stdcall{$ENDIF};
   TSQLDisconnect=function (hdbc:Integer) :Smallint;{$IFDEF LINUX}cdecl{$ELSE}stdcall{$ENDIF};
-  TSQLAllocStmt=function (hdbc:Integer; var phstmt:Integer):Smallint;{$IFDEF LINUX}cdecl{$ELSE}stdcall{$ENDIF};
+  TSQLAllocStmt=function (hdbc:Integer; var phstmt: NativeInt):Smallint;{$IFDEF LINUX}cdecl{$ELSE}stdcall{$ENDIF};
   TSQLFreeStmt=function (hstmt:Integer;  fOption:Smallint) :Smallint;{$IFDEF LINUX}cdecl{$ELSE}stdcall{$ENDIF};
   TSQLExecDirect=function (hstmt:Integer;  szSqlStr:PCHAR;  cbSqlStr:Integer) :Smallint;{$IFDEF LINUX}cdecl{$ELSE}stdcall{$ENDIF};
   TSQLFetchScroll=function (hstmt:Integer;

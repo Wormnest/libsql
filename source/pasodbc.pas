@@ -198,7 +198,7 @@ begin
 end;
 
 function TODBCDB.Query(SQL: String): Boolean;
-var Statement: Integer;
+var Statement: NativeInt;
     odbcres: Integer;
 begin
   Result := False;
@@ -523,7 +523,7 @@ var res: Integer;
 begin
   if not FDLLLoaded then
     exit;
-  res := SQLAllocStmt (ODBCHandle, Integer(Result));
+  res := SQLAllocStmt (ODBCHandle, NativeInt(Result));
   if res = SQL_SUCCESS then
     begin
       UseResultSet (Result);
