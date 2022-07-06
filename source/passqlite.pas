@@ -2011,7 +2011,7 @@ end;
 //16-1-2008
 function SqlCompareFunc( user: pointer;
                 lenA: Integer; A: PAnsiChar;
-                lenB: Integer; B: PAnsiChar): Integer; stdcall; //cdecl;
+                lenB: Integer; B: PAnsiChar): Integer; cdecl;
 var S1, S2: string;
     i: Integer;
     function MyCompareText(s1,s2: AnsiString): Integer;
